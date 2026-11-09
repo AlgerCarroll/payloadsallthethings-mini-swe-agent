@@ -1,0 +1,28 @@
+name: check-markdown
+on: [push, pull_request]
+
+
+jobs:
+  markdownlint:
+    name: Markdown lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed Markdown files
+        id: changed-markdown
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            **/*.md
+          separator: "\n"
+
+      - name: Run markdownlint
+        if: steps.changed-markdown.outputs.any_changed == 'true'
+        uses: DavidAnson/markdownlint-cli2-action@v19
+        with:
+          config: .github/.markdownlint.json
+          globs: ${{ steps.changed-markdown.outputs.all_changed_files }}
